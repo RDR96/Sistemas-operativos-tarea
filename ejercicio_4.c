@@ -11,14 +11,16 @@ void signalChildHandler(int signal);
 void signalWaiting(int signal);
 void changeDirection(int signal);
 void exitProgram(int signal);
+void fillArray();
 
-int valor[5];
+int valor[10];
 int parentID = 0;
 int order = 0;
 
 int main () {
 
   int hijos;
+  fillArray();
 
   signal(SIGUSR1, signalWaiting);
   signal(SIGTSTP, changeDirection);
@@ -52,15 +54,13 @@ void generarHijos(int hijos) {
   }
 
   if (getpid() != parentID) {
-    while (1) {
-      pause();
-    };
+    while (1);
   }
   else {
     signal(SIGINT, exitProgram);
     while (1) {
       printChildrenIDs();
-      //kill(getpid(), SIGTSTP);
+
     }
   }
 
@@ -70,7 +70,8 @@ void printChildrenIDs () {
   if (order == 0) {
     printf("\n");
     for (int i = 0; i < (sizeof(valor)/sizeof(valor[0])); i++) {
-      if (order == 1) break;
+      printf("Valor: %d\n", valor[i]);
+      if (order == 1 || valor[i] == -1) break;
       fprintf(stderr,"PID proceso hijo #%d ", i + 1 );
       kill(valor[i], SIGUSR2);
       pause();
@@ -80,15 +81,18 @@ void printChildrenIDs () {
     printf("\n");
     for (int i = (sizeof(valor)/sizeof(valor[0])) - 1; i >= 0 ; i--) {
       if (order == 0) break;
-      fprintf(stderr,"PID proceso hijo #%d ",  i + 1);
-      kill(valor[i], SIGUSR2);
-      pause();
+      if (valor[i] != -1) {
+        fprintf(stderr,"PID proceso hijo #%d ",  i + 1);
+        kill(valor[i], SIGUSR2);
+        pause();
+      }
+
     }
   }
 }
 
 void signalChildHandler (int signalint) {
-  printf("%d\n", getpid());
+  fprintf(stderr,"%d\n", getpid());
   sleep(1);
   kill(parentID, SIGUSR1);
 }
@@ -106,5 +110,11 @@ void exitProgram (int signal) {
   }
 
   exit(0);
+}
+
+void fillArray () {
+  for (int i = 0;  i < (sizeof(valor)/sizeof(valor[0])); i++) {
+    valor[i] = -1;
+  }
 }
   //printf("Se esta ejecutando esta linea. Signal: %d\n", signal);
