@@ -97,7 +97,7 @@ void signalChildHandler (int signalint) {
   kill(parentID, SIGUSR1);
 }
 
-void signalWaiting (int signal) {}
+void signalWaiting (int signal) { }
 
 void changeDirection (int signal) {
   if (getpid() == parentID)
@@ -110,6 +110,7 @@ void exitProgram (int signal) {
     for (int i = 0;  i < (sizeof(valor)/sizeof(valor[0])); i++) {
       kill(valor[i], SIGINT);
       printf("Proceso eliminado\n");
+      wait(NULL);
     }
 
     exit(0);
