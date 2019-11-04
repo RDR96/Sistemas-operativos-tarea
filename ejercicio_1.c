@@ -11,11 +11,24 @@ void imprimirTabulacion(int nivelTabulacion);
 
 int main() {
   int numberOfProcccess;
+  char numero[20];
+  char *p;
+
 
   printf("Ingrese el nivel del arbol de procesos: ");
-  scanf("%d", &numberOfProcccess);
 
-  imprimirNivel(numberOfProcccess);
+  fgets(numero, 20, stdin);
+
+  long int valor = strtol(numero, &p, 10);
+
+  printf("%s\n", p);
+
+  if (valor == 0) {
+    printf("Ingrese un valor valido\n");
+    exit(0);
+  }
+
+  imprimirNivel(valor);
   wait(NULL);
 
   return 0;

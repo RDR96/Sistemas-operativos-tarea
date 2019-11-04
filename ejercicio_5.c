@@ -13,30 +13,9 @@ typedef struct {
   sigset_t *sig;
 }nodo;
 
+void* childThread(void *args);
 
-void* doSomething(void *args) {
-  sigset_t sig;
-  int number;
-  nodo *prueba = (nodo*)args;
 
-   int s, sigVal;
-
-   while (1) {
-       s = sigwait(prueba->sig, &sigVal);
-
-       if (sigVal == SIGUSR1){
-         printf("id Hijo #%d: %lu\n", prueba->number, pthread_self());
-         sleep(1);
-         pthread_kill(prueba->parentId, SIGUSR1);
-       }
-       if (sigVal == SIGTERM) {
-         printf("sALIO:  id Hijo #%d: %lu\n", prueba->number, pthread_self());
-         pthread_kill(prueba->parentId, SIGTERM);
-         pthread_exit(NULL);
-       }
-   }
-
-}
 
 int order = 0;
 int valorCondicion = 1;
@@ -54,17 +33,27 @@ int main () {
 
   sigset_t sig;
   int number;
-  int numeroHilos;
+
   int s;
   int s1, sigVal1;
   int counter = 0;
 
   signal(SIGTSTP, changeDirection);
   signal(SIGINT, quitT);
+  signal(SIGTERM, quitT);
 
 
   fprintf(stderr, "Cuantos hilos desea crear?");
-  scanf("%d", &numeroHilos);
+
+  char numeros[100];
+  char* ptr;
+  fgets(numeros, 100, stdin);
+
+  long int numeroHilos = strtol(numeros, &ptr, 10);
+  if (numeroHilos == 0) {
+    printf("No se ingreso un numero\n");
+    exit(0);
+  }
 
 
   pthread_t arrayOfThreads[numeroHilos];
@@ -75,11 +64,11 @@ int main () {
   parentId = pthread_self();
 
   for (int i = 0; i < numeroHilos; i++) {
-    nodo *argss = (nodo *)malloc(sizeof(nodo));
-    argss->parentId = pthread_self();
-    argss->number = i;
-    argss->sig = &sig;
-    pthread_create(&arrayOfThreads[i], NULL, doSomething, argss);
+    nodo *threadStruct = (nodo *)malloc(sizeof(nodo));
+    threadStruct->parentId = pthread_self();
+    threadStruct->number = i + 1;
+    threadStruct->sig = &sig;
+    pthread_create(&arrayOfThreads[i], NULL, childThread, threadStruct);
 
   }
 
@@ -108,4 +97,29 @@ int main () {
 
 
   return 0;
+}
+
+void* childThread(void *args) {
+  sigset_t sig;
+  int number;
+
+  nodo *prueba = (nodo*)args;
+
+   int s, sigVal;
+
+   while (1) {
+       s = sigwait(prueba->sig, &sigVal);
+
+       if (sigVal == SIGUSR1){
+         printf("id Hijo #%d: %lu\n", prueba->number, pthread_self());
+         sleep(1);
+         pthread_kill(prueba->parentId, SIGUSR1);
+       }
+       if (sigVal == SIGTERM) {
+         printf("sALIO:  id Hijo #%d: %lu\n", prueba->number, pthread_self());
+         pthread_kill(prueba->parentId, SIGTERM);
+         pthread_exit(NULL);
+       }
+   }
+
 }

@@ -34,8 +34,6 @@ void *pedir(void *args)
 void *ordenar(void *args)
 {
 
-
-
 	vector *vect=(vector *)args;
 
 	for (int i = 1; i < vect->cn; i++)
@@ -61,10 +59,10 @@ void *ordenar(void *args)
 	for (int i = 0; i < vect->cn; i++){
 		printf("%d) ",i);
 		printf("%d\n", vect->n[i]);
-		
+
 	}
 	pthread_mutex_unlock(&llave2);
-	printf("\nSalio Normal\n");
+
 
 }
 
@@ -97,7 +95,6 @@ void *ordenarInverso(void *args)
 		printf("%d\n", vect->n[i]);
 	}
 	pthread_mutex_unlock(&llave2);
-	printf("Salio Inverso");
 
 }
 

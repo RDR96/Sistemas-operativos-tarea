@@ -8,19 +8,17 @@
 
 sigset_t mask, pending;
 
-void showMenu();
+
 
 void signal_handler (int sig) {
-    
-    printf("\n");
-    showMenu();
+
+
     if (sig == SIGINT) {
       printf("\nSeñales bloqueadas:\n");
-
       sigpending(&pending);
       for (int i = 1; i <= 20; i++) {
         if(sigismember(&pending, i))
-            printf("INT: %d, %s\n", i, strsignal(i));
+            fprintf(stderr, "INT: %d, %s\n", i, strsignal(i));
       }
     }
 
@@ -32,51 +30,35 @@ int main() {
 
     sigemptyset(&mask);
 
-    sigaddset(&mask, SIGTERM);
-    sigaddset(&mask, SIGQUIT);
-    sigaddset(&mask, SIGTSTP);
-    sigaddset(&mask, SIGSEGV);
+    for (int i = 1; i <= 60; i++) {
+      if (i != SIGINT)
+        sigaddset(&mask, i);
+    }
+
+    //sigaddset(&mask, SIGTERM);
+    //sigaddset(&mask, SIGQUIT);
+    //sigaddset(&mask, SIGTSTP);
+    //sigaddset(&mask, SIGSEGV);
     sigprocmask(SIG_BLOCK, &mask, 0);
 
     signal(SIGINT, signal_handler);
 
+    char numeros[100];
+    char* ptr;
+    printf("Ingrese 2 para ver seniales bloqueadas: \n");
     while (corriendo) {
-        showMenu();
-        scanf("%d", &valor);
-        switch (valor) {
-            case 1:
-              kill(getpid(), SIGTERM);
-              printf("\nParece que no es posible terminar el programa\n");
-            break;
+      fprintf(stderr, "Ingrese el numero de la senial a bloquear: ");
 
-            case 2:
-              kill(getpid(), SIGQUIT);
-              printf("\nParece que no es posible terminar el programa\n");
-            break;
+      fgets(numeros, 100, stdin);
 
-            case 3:
-              kill(getpid(), SIGTSTP);
-              printf("\nParece que no es posible terminar el programa\n");
-            break;
+      long int valorN = strtol(numeros, &ptr, 10);
 
-            case 4:
-              kill(getpid(), SIGSEGV);
-              printf("\nParece que no es posible terminar el programa\n");
-            break;
-
-        }
+      if (valorN == 0) {
+        printf("Ingrese un numero de 1 a 60\n");
+        exit(0);
+      }
+      kill(getpid(), valorN);
     }
 
     return 0;
-}
-
-void showMenu() {
-  printf("\n1-Terminar el proceso: SIGTERM\n");
-  printf("2-Salir del programa: SIGQUIT\n");
-  printf("3-Parar el programa: SIGTSTP\n");
-  printf("4-Violacion de segmento: SIGSEGV\n");
-  printf("\nPuede realizar los siguientes comandos: \n");
-  printf("Control Z: Detener el proceso\n");
-  printf("Control \\: Salir del proceso\n");
-  printf("Control C: Mostrar seniales bloqueadas\n");
 }

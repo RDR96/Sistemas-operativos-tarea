@@ -4,16 +4,19 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #define MAX 256
 
 int main (int argc, char *argv[], char *env[]) {
-  //char cadena[50];
-  //fprintf(stderr, "¿Que programa desea ejecutar?");
-  //scanf("%s", &cadena[0]);
-  //printf("%s\n", cadena);
+
   while (1) {
-    int proceso = vfork();
+
+    int proceso;
+    if ((proceso = vfork()) == -1) {
+        printf("%d", errno);
+    }
+
     int contador = 0;
 
     if (proceso == 0) {
@@ -23,7 +26,7 @@ int main (int argc, char *argv[], char *env[]) {
 
         char varAux[MAX];
         char* cadena[20];
-        char* token;        
+        char* token;
         char delim[4] = " \n\t";
         int i = 0;
 
@@ -40,7 +43,6 @@ int main (int argc, char *argv[], char *env[]) {
           cadena[i] = token;
           token = strtok(NULL, delim);
           i++;
-
         }
 
         if (token == NULL && i < 20) {
@@ -50,14 +52,10 @@ int main (int argc, char *argv[], char *env[]) {
         env[contador + 1] = NULL;
 
         execve(cadena[0], cadena, env);
-
+        perror("No se pudo ejecutar el programa ");
     }
     wait(NULL);
   }
-
-
-
-
 
   return 0;
 }
