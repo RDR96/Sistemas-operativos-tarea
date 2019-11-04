@@ -5,7 +5,7 @@
 #include <string.h>
 
 int max = 1000;
-int i, j, aux;
+int aux;
 pthread_mutex_t llave, llave2;
 
 typedef struct
@@ -22,7 +22,7 @@ void *pedir(void *args)
 	int valor;
 	scanf("%d", &vect->cn);
 
-	for (i = 0; i < vect->cn; i++)
+	for (int i = 0; i < vect->cn; i++)
 	{
 		printf("Ingrese el Elemento #%d: \n", i);
 		scanf("%d", &vect->n[i]);
@@ -38,10 +38,10 @@ void *ordenar(void *args)
 
 	vector *vect=(vector *)args;
 
-	for (i = 1; i < vect->cn; i++)
+	for (int i = 1; i < vect->cn; i++)
 	{
 
-		for (j = 0; j < vect->cn - i; j++)
+		for (int j = 0; j < vect->cn - i; j++)
 		{
 			pthread_mutex_lock(&llave);
 			if (vect->n[j] > vect->n[j + 1])
@@ -51,16 +51,20 @@ void *ordenar(void *args)
 				vect->n[j] = aux;
 			}
 			pthread_mutex_unlock(&llave);
+
 		}
 
 	}
 
 	pthread_mutex_lock(&llave2);
 	printf("\nNormal\n");
-	for (i = 0; i < vect->cn; i++)
+	for (int i = 0; i < vect->cn; i++){
+		printf("%d) ",i);
 		printf("%d\n", vect->n[i]);
+		
+	}
 	pthread_mutex_unlock(&llave2);
-
+	printf("\nSalio Normal\n");
 
 }
 
@@ -69,10 +73,10 @@ void *ordenarInverso(void *args)
 
 	vector *vect=(vector *)args;
 
-	for (i = 0; i < vect->cn - 1; i++)
+	for (int i = 0; i < vect->cn - 1; i++)
 	{
 
-		for (j = vect->cn - 1; j >= i + 1; j--)
+		for (int j = vect->cn - 1; j >= i + 1; j--)
 		{
 			pthread_mutex_lock(&llave);
 			if ( vect->n[j - 1] > vect->n[j])
@@ -88,10 +92,12 @@ void *ordenarInverso(void *args)
 
 	pthread_mutex_lock(&llave2);
 	printf("\nInverso\n");
-	for (i = 0; i < vect->cn; i++)
+	for (int i = 0; i < vect->cn; i++){
+		printf("%d) ",i);
 		printf("%d\n", vect->n[i]);
+	}
 	pthread_mutex_unlock(&llave2);
-
+	printf("Salio Inverso");
 
 }
 
