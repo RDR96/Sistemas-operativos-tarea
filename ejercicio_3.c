@@ -23,8 +23,7 @@ int main (int argc, char *argv[], char *env[]) {
 
         char varAux[MAX];
         char* cadena[20];
-        char* token;
-        char* texto;
+        char* token;        
         char delim[4] = " \n\t";
         int i = 0;
 
